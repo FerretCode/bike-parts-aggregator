@@ -1,0 +1,102 @@
+﻿@page "/"
+@attribute [StreamRendering]
+
+<PageTitle>Parts</PageTitle>
+
+<h1>Parts</h1>
+
+<p>Bicycle Parts</p>
+
+<div class="w-full mb-2"> 
+    <input type="text" placeholder="Enter Query" class="input w-full" />
+</div>
+
+@if (parts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Date</th>
+            <th aria-label="Name of Part">Name</th>
+            <th aria-label="Part Stock">Stock</th>
+            <th aria-label="Part Dimensions">Dimensions</th>
+            <th aria-label="Part Standards">Standards</th>
+            <th aria-label="Part Keywords">Keywords</th>
+            <th aria-label="Part Type">Type</th>
+            <th aria-label="Part Description">Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var part in parts)
+        {
+            <tr>
+                <td>@part.Date.ToShortDateString()</td>
+                <td>@part.Name</td>
+                <td>@part.Stock.ToString()</td>
+                <td>@part.Dimensions.ToString()</td>
+                <td>@string.Join(", ", part.Standards)</td>
+                <td>@string.Join(", ", part.Keywords)</td>
+                <td>@part.Type.ToString()</td>
+                <td>@part.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private Part[]? parts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+
+        var startDate = DateOnly.FromDateTime(DateTime.Now);
+        parts = Enumerable.Range(1, 5).Select(index => new Part
+        {
+            Date = startDate.AddDays(index),
+            Name = "test",
+            Stock = 5,
+            Dimensions = new Dimensions {X = 68, Y = 0, Z = 118},
+            Standards = new List<string> { "JIS" },
+            Keywords = new List<string> { "Bottom Bracket", "JIS", "68x118" },
+            Type = PartType.BottomBracket,
+            Description = "test bottom bracket"
+        }).ToArray();
+    }
+
+    private enum PartType
+    {
+        Saddle,
+        BottomBracket
+    }
+
+    private class Dimensions
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Z { get; set; }
+
+        public override string ToString()
+        {
+            return $"{X}x{Y}x{Z}";
+        }
+    }
+
+    private class Part
+    {
+        public DateOnly Date { get; set; }
+        public string Name { get; set; }
+        public int Stock { get; set; } 
+        public Dimensions Dimensions { get; set; }
+        public List<string> Standards { get; set; }
+        public List<string> Keywords { get; set; }
+        public PartType Type { get; set; }
+        public string? Description { get; set; }
+    }
+
+}
